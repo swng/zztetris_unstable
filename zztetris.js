@@ -601,11 +601,11 @@ function callback() {
 					dasID++;
 					das('R', dasID);
 					break;
+                */
 				case 'SD':
 					sdID++;
 					softDrop(sdID);
 					break;
-                */
 				case 'HD':
 					hardDrop();
 					break;
@@ -923,6 +923,13 @@ function callback() {
 	}
 
     function render() {
+        /*
+        if (keystrokes['SD'] && keystrokes['last'] != 'SD') {
+            sdID++;
+            softDrop(sdID);
+            keystrokes['last'] = 'SD';
+        }
+        */
         if (keystrokes['L'] && keystrokes['R']) {
             if (keystrokes['last'] == 'L') {
                 dasID++;
@@ -946,12 +953,6 @@ function callback() {
                 das('R', dasID);
                 keystrokes['last'] = 'R';
             }
-        }
-        if (keystrokes['SD'] && keystrokes['last'] != 'SD') {
-            console.log("hi")
-            sdID++;
-            softDrop(sdID);
-            keystrokes['last'] = 'SD';
         }
 
 		ctx.clearRect(0, 0, boardSize[0] * cellSize, boardSize[1] * cellSize);
