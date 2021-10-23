@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<script src="jquery.js"></script>
+	<script defer src="test3.js"></script>
+	<script src="rotationSystem.js"></script>
+	<script src="tetris-fumen.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+	<link rel="icon" href="./pieceSprite/z.png" />
+	<style>
+		@font-face {
+			font-family: Muro;
+			src: url('Muroslant.otf');
+		}
+		.queue {
+			text-align: center;
+			font-family: Muro;
+			font-size: 28px;
+			letter-spacing: 2px;
+		}
+		canvas {
+			vertical-align: top;
+		}
+	</style>
+	<head>
+		<meta charset="UTF-8" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://swng.github.io/zztetris/" />
+		<meta property="og:title" content="ZZTetris" />
+		<meta
+			property="og:description"
+			content='a tetris client that starts with ZZ so you can type "ZZ" into your address bar and have it autocommplete'
+		/>
+		<meta
+			property="og:image"
+			content="https://cdn.discordapp.com/attachments/209687919361916928/898230618012418088/unknown.png"
+		/>
+		<title>ZZTetris</title>
+	</head>
+	<body style="background-color: #222; color: #fff">
+		<div style="top: 50%; left: 50%; position: fixed; transform: translate(-50%, -50%); display: flex">
+			<div class="queue">
+				HOLD
+				<hr />
+				<canvas id="h" width="90" height="60"></canvas>
+				<div id="notif" style="width: 90px; text-align: center"></div>
+			</div>
+			<div>
+				<canvas id="b" width="200" height="400" style="padding: 18px"></canvas>
+			</div>
+			<div class="queue">
+				NEXT
+				<hr />
+				<canvas id="n" width="90" height="360"></canvas>
+			</div>
+			<div>
+				<button onclick="this.blur(); shuffleQueue();">Shuffle Queue</button>
+			</div>
+			<div>
+				<button onclick="this.blur(); shuffleQueuePlusHold();">Shuffle Queue + Hold</button>
+			</div>
+		</div>
+		<div>
+			<button onclick="this.blur(); window.open('https\:\/\/github.com/swng/zztetris#readme')">About</button>
+		</div>
+		<div>
+			<button target="popup" onclick="ctrlsPopup()">Game Settings</button>
+		</div>
+		<div>
+			<button onclick="this.blur(); exportFumen()">Export Fumen</button>
+		</div>
+		<div>
+			<button onclick="this.blur(); importFumen()">Import Fumen</button>
+		</div>
+		<div>
+			<button onclick="this.blur(); importImage()">Import Image</button>
+		</div>
+	</body>
+</html>
