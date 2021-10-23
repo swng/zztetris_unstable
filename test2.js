@@ -879,7 +879,12 @@ function callback() {
 				//shift(shiftDir);
 				if (shiftDir == -1) move('L');
 				if (shiftDir == 1) move('R');
-			}
+            } else if (ARR === 0) {
+                for (let i = 0; i < 9; i++) {
+                    if (shiftDir == -1) move('L');
+				    if (shiftDir == 1) move('R');
+                }
+            }
 		}
 		if (lastKeys !== keysDown) {
 			lastKeys = keysDown;
