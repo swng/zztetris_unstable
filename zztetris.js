@@ -1499,7 +1499,7 @@ function callback() {
 		if (cleared > 0) text += ['NULL', 'SINGLE', 'DOUBLE', 'TRIPLE', 'QUAD'][cleared];
 		if (pc) text += '\nPERFECT\nCLEAR!';
 
-		if (text != '') notify(text);
+		//if (text != '') notify(text);
 		if (tspin || cleared == 4) playSnd('ClearTetra', true);
 		if (pc) playSnd('PerfectClear', 1);
 
