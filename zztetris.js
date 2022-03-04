@@ -1463,20 +1463,25 @@ function callback() {
 			}
 		}
 
+        clearedIndexes = [];
+
 		board = board.filter(
-			(r) =>
-				!r
-					.map((c) => {
-						return c.t == 1;
-					})
-					.every((v) => v)
+            (r, i) => {
+                
+                temp = !r
+                    .map((c) => {
+                        return c.t == 1;
+                    })
+                    .every((v) => v);
+                if (!temp) clearedIndexes.push(i);
+                return temp;
+            }
 		);
 		var l = board.length;
-		var cleared = 0;
 		for (let i = 0; i < boardSize[1] - l; i++) {
-			cleared++;
 			board.unshift(aRow());
-		}
+        }
+        var cleared = clearedIndexes.length;
 
 		if (board[board.length - 1].filter((c) => c.t == 0).length == boardSize[0]) pc = true;
 
@@ -1500,8 +1505,8 @@ function callback() {
 		if (pc) text += '\nPERFECT\nCLEAR!';
 
 		//if (text != '') notify(text);
-		if (tspin || cleared == 4) playSnd('ClearTetra', true);
-		if (pc) playSnd('PerfectClear', 1);
+		//if (tspin || cleared == 4) playSnd('ClearTetra', true);
+		//if (pc) playSnd('PerfectClear', 1);
 
 		originality_delta = 0;
 
@@ -1563,30 +1568,38 @@ function callback() {
 			e = xblast.sources.types['quad'];
 			originality_delta += e < 0.5 ? -2 : e;
 			xblast.sources.types['quad'] = 0;
-		}
+        }
 
-		if (cleared > 0 || tspin) {
+        if (cleared > 0 || tspin) {
+            console.log(clearedIndexes);
 			var p = pieces[piece][rot];
 			temp = [];
 			p.map((r, i) => {
 				r.map((c, ii) => {
-					if (c == 1) {
-						temp.push(ii + xPOS);
-						//xblast.sources.columns[ii + xPOS] = 0;
+                    if (c == 1) {
+                        if (clearedIndexes.includes(i + yPOS)) temp.push(ii + xPOS);
 					}
 				});
 			});
-			temp = [...new Set(temp)]; // remove dupes by converting to Set and back again lul
+			
 			for (columnIndex of temp) {
 				const s = Math.min(1, xblast.sources.columns[columnIndex]);
 				originality_delta += s < 0.5 ? -1 : s;
-				xblast.sources.columns[columnIndex] = 0;
+				xblast.sources.columns[columnIndex] -= s;
             }
             
             console.log(originality_delta);
 
-			if (originality_delta >= 4 + cleared) notify('COOL');
-			else if (originality_delta < 0) notify('REGRET');
+            if (originality_delta >= 4 + cleared) {
+                notify('COOL');
+                console.log('COOL');
+                playSnd('coolW', true);
+            }
+            else if (originality_delta < 0) {
+                notify('REGRET');
+                console.log('REGRET');
+                playSnd('regretW', true);
+            }
 		}
 	}
 
