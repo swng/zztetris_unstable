@@ -182,6 +182,66 @@ xblast = {
 	},
 };
 
+function updateBonuses(n = 1) {
+	for (i = 0; i < n; i++) {
+		let e = 0;
+		for (const s of xblast.sources.columns) e += 4 - s;
+		for (const s of Object.values(xblast.sources.types)) e += 4 - s;
+		const s = Math.pow(1.05, Math.max(0, e - 8)) / 600;
+		for (let e = 0; e < xblast.sources.columns.length; e++)
+			xblast.sources.columns[e] = Math.min(4, xblast.sources.columns[e] + s);
+		for (const e of Object.keys(xblast.sources.types))
+			xblast.sources.types[e] = Math.min(4, xblast.sources.types[e] + s);
+	}
+}
+
+function PRNG(seed) {
+	let _seed = parseInt(seed) % 2147483647;
+
+	if (_seed <= 0) {
+		_seed += 2147483646;
+	}
+
+	return {
+		next: function () {
+			return (_seed = (_seed * 16807) % 2147483647);
+		},
+		nextFloat: function (opt_minOrMax, opt_max) {
+			return (this.next() - 1) / 2147483646;
+		},
+		shuffleArray: function (array) {
+			let i = array.length;
+			let j;
+
+			if (i == 0) {
+				return array;
+			}
+
+			while (--i) {
+				j = Math.floor(this.nextFloat() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+			return array;
+		},
+		getCurrentSeed: function () {
+			return _seed;
+		},
+	};
+}
+
+function generateQueue(seed, pieces) {
+    num_bags = Math.ceil(pieces / 7);
+	vo = { minotypes: ['z', 'l', 'o', 's', 'i', 'j', 't'] };
+	rng = PRNG(seed);
+	bag = [];
+	for (i = 0; i < num_bags; i++) {
+		e = [...vo.minotypes];
+		rng.shuffleArray(e);
+		bag.push(...e);
+    }
+    console.log(bag.join(""));
+}
+
 // Keys
 var keysDown;
 var lastKeys;
@@ -1463,25 +1523,22 @@ function callback() {
 			}
 		}
 
-        clearedIndexes = [];
+		clearedIndexes = [];
 
-		board = board.filter(
-            (r, i) => {
-                
-                temp = !r
-                    .map((c) => {
-                        return c.t == 1;
-                    })
-                    .every((v) => v);
-                if (!temp) clearedIndexes.push(i);
-                return temp;
-            }
-		);
+		board = board.filter((r, i) => {
+			temp = !r
+				.map((c) => {
+					return c.t == 1;
+				})
+				.every((v) => v);
+			if (!temp) clearedIndexes.push(i);
+			return temp;
+		});
 		var l = board.length;
 		for (let i = 0; i < boardSize[1] - l; i++) {
 			board.unshift(aRow());
-        }
-        var cleared = clearedIndexes.length;
+		}
+		var cleared = clearedIndexes.length;
 
 		if (board[board.length - 1].filter((c) => c.t == 0).length == boardSize[0]) pc = true;
 
@@ -1534,9 +1591,9 @@ function callback() {
 					xblast.sources.types['tss'] = 0;
 				}
 			} else {
-                e = xblast.sources.types['single'];
-                originality_delta += e < 0.5 ? -2 : e;
-                xblast.sources.types['single'] = 0;
+				e = xblast.sources.types['single'];
+				originality_delta += e < 0.5 ? -2 : e;
+				xblast.sources.types['single'] = 0;
 			}
 		} else if (cleared == 2) {
 			if (tspin) {
@@ -1568,38 +1625,39 @@ function callback() {
 			e = xblast.sources.types['quad'];
 			originality_delta += e < 0.5 ? -2 : e;
 			xblast.sources.types['quad'] = 0;
-        }
+		}
 
-        if (cleared > 0 || tspin) {
-            console.log(clearedIndexes);
+		if (cleared > 0 || tspin) {
+			console.log(clearedIndexes);
 			var p = pieces[piece][rot];
 			temp = [];
 			p.map((r, i) => {
 				r.map((c, ii) => {
-                    if (c == 1) {
-                        if (clearedIndexes.includes(i + yPOS)) temp.push(ii + xPOS);
+					if (c == 1) {
+						if (clearedIndexes.includes(i + yPOS)) temp.push(ii + xPOS);
 					}
 				});
 			});
-			
+
 			for (columnIndex of temp) {
 				const s = Math.min(1, xblast.sources.columns[columnIndex]);
 				originality_delta += s < 0.5 ? -1 : s;
 				xblast.sources.columns[columnIndex] -= s;
-            }
-            
-            console.log(originality_delta);
+			}
 
-            if (originality_delta >= 4 + cleared) {
-                notify('COOL');
-                console.log('COOL');
-                playSnd('coolW', true);
-            }
-            else if (originality_delta < 0) {
-                notify('REGRET');
-                console.log('REGRET');
-                playSnd('regretW', true);
-            }
+			console.log(originality_delta);
+			xblast.originality += originality_delta;
+			$('#stats').text(Math.pow(1.025, xblast.originality) + xblast.originality);
+
+			if (originality_delta >= 4 + cleared) {
+				notify('COOL');
+				console.log('COOL');
+				playSnd('coolW', true);
+			} else if (originality_delta < 0) {
+				notify('REGRET');
+				console.log('REGRET');
+				playSnd('regretW', true);
+			}
 		}
 	}
 
@@ -1617,15 +1675,6 @@ function callback() {
 
 	function render() {
 		checkShift();
-
-		let e = 0;
-		for (const s of xblast.sources.columns) e += 4 - s;
-		for (const s of Object.values(xblast.sources.types)) e += 4 - s;
-		const s = Math.pow(1.05, Math.max(0, e - 8)) / 600;
-		for (let e = 0; e < xblast.sources.columns.length; e++)
-			xblast.sources.columns[e] = Math.min(4, xblast.sources.columns[e] + s);
-		for (const e of Object.keys(xblast.sources.types))
-			xblast.sources.types[e] = Math.min(4, xblast.sources.types[e] + s);
 
 		for (colIndex = 0; colIndex < 10; colIndex++) {
 			val = xblast.sources.columns[colIndex];
@@ -1667,12 +1716,16 @@ function callback() {
 				}
 			});
 		});
-		//window.requestAnimationFrame(render);
+		window.requestAnimationFrame(render);
 	}
-	
+	/*
 	setInterval(() => {
 		render();
-	}, 1000/30);
+	}, 0);
+    */
+    window.requestAnimationFrame(render);
+    setInterval(() => {
+		updateBonuses();
+    }, 1000 / 60);
     
-	//window.requestAnimationFrame(render);
 }
