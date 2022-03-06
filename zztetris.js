@@ -1643,11 +1643,8 @@ function callback() {
 				const s = Math.min(1, xblast.sources.columns[columnIndex]);
 				originality_delta += s < 0.5 ? -1 : s;
 				xblast.sources.columns[columnIndex] -= s;
-			}
-
-			console.log(originality_delta);
-			xblast.originality += originality_delta;
-			$('#stats').text(Math.pow(1.025, xblast.originality) + xblast.originality);
+            }
+            
 
 			if (originality_delta >= 4 + cleared) {
 				notify('COOL');
@@ -1657,7 +1654,20 @@ function callback() {
 				notify('REGRET');
 				console.log('REGRET');
 				playSnd('regretW', true);
-			}
+            }
+
+            if (pc) {
+                notify('REGRET');
+				console.log('REGRET');
+				playSnd('regretW', true);
+                originality_delta -= 9.15;
+            }
+
+            
+            console.log(originality_delta);
+			xblast.originality += originality_delta;
+            $('#stats').text(Math.pow(1.025, xblast.originality) + xblast.originality);
+            
 		}
 	}
 
